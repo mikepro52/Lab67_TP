@@ -1,0 +1,1050 @@
+// Вариант 12. АИС «Анализ продаж».
+// Лабораторные 6.a и 6.b: данные живут здесь, в разметке index.html их нет.
+// ObjInf — журнал продаж, главная коллекция. Минимум по заданию — 20 объектов.
+// id, description, createdAt, author и photoLink — обязательная структура задания.
+// Остальные поля — предметная область: товар, артикул, вид, покупатель, цена.
+// Скидку и сумму чека коллекция не хранит заранее: их считает Shop по правилам магазина.
+
+var DEMO_DATE = '2026-11-16';
+
+var CATEGORIES = [
+  "Одежда",
+  "Обувь",
+  "Кожгалантерея",
+  "Чулочно-носочные изделия",
+];
+
+var CARD_NUMBERS = {
+  c1: "10482",
+  c2: "33019",
+  c3: "55107",
+  c4: "22846",
+  c5: "67320",
+  c6: "41958",
+  c7: "80231",
+  c8: "14670",
+  c9: "59014",
+  c10: "26743",
+  c11: "73108",
+  c12: "38526",
+};
+
+var customers = [
+  {
+    id: "c1",
+    fullName: "Петрова Анна Сергеевна",
+    phone: "+375 29 612-44-18",
+    birthday: "1994-11-16"
+  },
+  {
+    id: "c2",
+    fullName: "Кузнецов Илья Павлович",
+    phone: "+375 33 701-22-90",
+    birthday: "1991-03-02"
+  },
+  {
+    id: "c3",
+    fullName: "Орлова Дарья Игоревна",
+    phone: "+375 29 445-10-77",
+    birthday: "1999-07-21"
+  },
+  {
+    id: "c4",
+    fullName: "Савицкий Павел Андреевич",
+    phone: "+375 25 880-14-03",
+    birthday: "1988-01-15"
+  },
+  {
+    id: "c5",
+    fullName: "Мороз Алина Викторовна",
+    phone: "+375 29 220-67-41",
+    birthday: "1996-11-16"
+  },
+  {
+    id: "c6",
+    fullName: "Белов Никита Олегович",
+    phone: "+375 33 118-55-26",
+    birthday: "1993-05-09"
+  },
+  {
+    id: "c7",
+    fullName: "Гринь Вера Николаевна",
+    phone: "+375 29 903-48-12",
+    birthday: "2000-12-01"
+  },
+  {
+    id: "c8",
+    fullName: "Хомич Егор Денисович",
+    phone: "+375 44 512-77-60",
+    birthday: "1997-09-28"
+  },
+  {
+    id: "c9",
+    fullName: "Яскевич Ольга Борисовна",
+    phone: "+375 29 334-19-85",
+    birthday: "1985-04-11"
+  },
+  {
+    id: "c10",
+    fullName: "Романов Глеб Сергеевич",
+    phone: "+375 33 267-40-52",
+    birthday: "1992-08-30"
+  },
+  {
+    id: "c11",
+    fullName: "Литвин София Артёмовна",
+    phone: "+375 29 156-83-04",
+    birthday: "1998-02-14"
+  },
+  {
+    id: "c12",
+    fullName: "Дрозд Марина Юрьевна",
+    phone: "+375 25 741-09-33",
+    birthday: "1990-11-03"
+  },
+];
+
+var products = [
+  {
+    id: "g1",
+    article: "PL-104",
+    name: "Пальто шерстяное",
+    category: "Одежда",
+    price: 189,
+    photoLink: "img/clothing.svg",
+    description: "Шерстяное пальто прямого кроя, на подкладке."
+  },
+  {
+    id: "g2",
+    article: "PL-221",
+    name: "Кардиган из кашемира",
+    category: "Одежда",
+    price: 142.5,
+    photoLink: "img/clothing.svg",
+    description: "Кашемировый кардиган на пуговицах."
+  },
+  {
+    id: "g3",
+    article: "PL-330",
+    name: "Платье миди",
+    category: "Одежда",
+    price: 84,
+    photoLink: "img/clothing.svg",
+    description: "Платье миди из плотного трикотажа."
+  },
+  {
+    id: "g4",
+    article: "PL-118",
+    name: "Блуза шёлковая",
+    category: "Одежда",
+    price: 67,
+    photoLink: "img/clothing.svg",
+    description: "Шёлковая блуза с мягким воротом."
+  },
+  {
+    id: "g5",
+    article: "SH-015",
+    name: "Туфли лодочки",
+    category: "Обувь",
+    price: 96,
+    photoLink: "img/shoes.svg",
+    description: "Кожаные туфли-лодочки на среднем каблуке."
+  },
+  {
+    id: "g6",
+    article: "SH-088",
+    name: "Ботинки челси",
+    category: "Обувь",
+    price: 128,
+    photoLink: "img/shoes.svg",
+    description: "Ботинки челси из гладкой кожи."
+  },
+  {
+    id: "g7",
+    article: "SH-102",
+    name: "Кроссовки городские",
+    category: "Обувь",
+    price: 115,
+    photoLink: "img/shoes.svg",
+    description: "Городские кроссовки на каждый день."
+  },
+  {
+    id: "g8",
+    article: "LG-007",
+    name: "Сумка кросс-боди",
+    category: "Кожгалантерея",
+    price: 74,
+    photoLink: "img/leather.svg",
+    description: "Небольшая кожаная сумка через плечо."
+  },
+  {
+    id: "g9",
+    article: "LG-019",
+    name: "Ремень кожаный",
+    category: "Кожгалантерея",
+    price: 36,
+    photoLink: "img/leather.svg",
+    description: "Кожаный ремень с металлической пряжкой."
+  },
+  {
+    id: "g10",
+    article: "LG-025",
+    name: "Портмоне",
+    category: "Кожгалантерея",
+    price: 42,
+    photoLink: "img/leather.svg",
+    description: "Компактное кожаное портмоне."
+  },
+  {
+    id: "g11",
+    article: "HS-003",
+    name: "Колготки 40 den",
+    category: "Чулочно-носочные изделия",
+    price: 12.5,
+    photoLink: "img/hosiery.svg",
+    description: "Матовые колготки плотностью 40 den."
+  },
+  {
+    id: "g12",
+    article: "HS-014",
+    name: "Носки шерстяные",
+    category: "Чулочно-носочные изделия",
+    price: 9.8,
+    photoLink: "img/hosiery.svg",
+    description: "Тёплые шерстяные носки, одна пара."
+  },
+];
+
+var employees = [
+  {
+    id: "e1",
+    fullName: "Соколова Мария",
+    position: "Продавец",
+    phone: "+375 29 700-11-21",
+    shifts: [
+      { date: "2026-11-16", hours: 8 },
+      { date: "2026-11-15", hours: 8 },
+      { date: "2026-11-10", hours: 8 },
+      { date: "2026-10-20", hours: 8 },
+    ]
+  },
+  {
+    id: "e2",
+    fullName: "Лебедев Артём",
+    position: "Продавец",
+    phone: "+375 29 700-11-22",
+    shifts: [
+      { date: "2026-11-16", hours: 8 },
+      { date: "2026-11-14", hours: 8 },
+      { date: "2026-11-10", hours: 8 },
+      { date: "2026-09-01", hours: 8 },
+    ]
+  },
+  {
+    id: "e3",
+    fullName: "Ковалёва Ирина",
+    position: "Продавец",
+    phone: "+375 29 700-11-23",
+    shifts: [
+      { date: "2026-11-16", hours: 6 },
+      { date: "2026-11-15", hours: 8 },
+      { date: "2026-11-10", hours: 8 },
+      { date: "2026-09-01", hours: 8 },
+    ]
+  },
+  {
+    id: "e4",
+    fullName: "Морозов Павел",
+    position: "Товаровед",
+    phone: "+375 29 700-11-24",
+    shifts: [
+      { date: "2026-11-16", hours: 8 },
+      { date: "2026-11-14", hours: 8 },
+      { date: "2026-10-20", hours: 8 },
+    ]
+  },
+  {
+    id: "e5",
+    fullName: "Григорьева Ольга",
+    position: "Администратор",
+    phone: "+375 29 700-11-25",
+    shifts: [
+      { date: "2026-11-16", hours: 8 },
+      { date: "2026-11-15", hours: 4 },
+      { date: "2026-10-20", hours: 8 },
+    ]
+  },
+  {
+    id: "e6",
+    fullName: "Новик Сергей",
+    position: "Директор",
+    phone: "+375 29 700-11-26",
+    shifts: [
+      { date: "2026-11-16", hours: 5 },
+      { date: "2026-11-10", hours: 8 },
+      { date: "2026-09-01", hours: 3 },
+    ]
+  },
+  {
+    id: "e7",
+    fullName: "Пашкевич Елена",
+    position: "Продавец",
+    phone: "+375 29 700-11-27",
+    shifts: [
+      { date: "2026-11-15", hours: 8 },
+      { date: "2026-11-14", hours: 8 },
+      { date: "2026-09-01", hours: 8 },
+    ]
+  },
+  {
+    id: "e8",
+    fullName: "Верес Антон",
+    position: "Кладовщик",
+    phone: "+375 29 700-11-28",
+    shifts: [
+      { date: "2026-11-16", hours: 8 },
+      { date: "2026-11-14", hours: 8 },
+      { date: "2026-10-20", hours: 6 },
+    ]
+  },
+];
+
+var ObjInf = [
+  {
+    id: "1",
+    description: "Пальто шерстяное, арт. PL-104, 1 шт. Оплата на кассе. Клиент: Петрова Анна Сергеевна.",
+    createdAt: new Date("2026-08-06T11:20:00"),
+    author: "Соколова Мария",
+    photoLink: "img/clothing.svg",
+    productName: "Пальто шерстяное",
+    article: "PL-104",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 189,
+    customerId: "c1",
+    customerName: "Петрова Анна Сергеевна",
+    customerPhone: "+375 29 612-44-18"
+  },
+  {
+    id: "2",
+    description: "Ремень кожаный, арт. LG-019, 1 шт. Покупатель примерил вещь. Клиент: Хомич Егор Денисович.",
+    createdAt: new Date("2026-08-08T13:05:00"),
+    author: "Лебедев Артём",
+    productName: "Ремень кожаный",
+    article: "LG-019",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 36,
+    customerId: "c8",
+    customerName: "Хомич Егор Денисович",
+    customerPhone: "+375 44 512-77-60"
+  },
+  {
+    id: "3",
+    description: "Платье миди, арт. PL-330, 2 шт. Постоянный клиент. Клиент: Мороз Алина Викторовна.",
+    createdAt: new Date("2026-08-11T16:40:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/clothing.svg",
+    productName: "Платье миди",
+    article: "PL-330",
+    category: "Одежда",
+    quantity: 2,
+    unitPrice: 84,
+    customerId: "c5",
+    customerName: "Мороз Алина Викторовна",
+    customerPhone: "+375 29 220-67-41"
+  },
+  {
+    id: "4",
+    description: "Сумка кросс-боди, арт. LG-007, 1 шт. Товар выдан со склада. Клиент: Орлова Дарья Игоревна.",
+    createdAt: new Date("2026-08-12T12:10:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/leather.svg",
+    productName: "Сумка кросс-боди",
+    article: "LG-007",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 74,
+    customerId: "c3",
+    customerName: "Орлова Дарья Игоревна",
+    customerPhone: "+375 29 445-10-77"
+  },
+  {
+    id: "5",
+    description: "Ботинки челси, арт. SH-088, 1 шт. Продажа в вечерней смене. Клиент: Петрова Анна Сергеевна.",
+    createdAt: new Date("2026-08-22T15:25:00"),
+    author: "Соколова Мария",
+    photoLink: "img/shoes.svg",
+    productName: "Ботинки челси",
+    article: "SH-088",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 128,
+    customerId: "c1",
+    customerName: "Петрова Анна Сергеевна",
+    customerPhone: "+375 29 612-44-18"
+  },
+  {
+    id: "6",
+    description: "Кроссовки городские, арт. SH-102, 1 шт. Без предзаказа. Клиент: Мороз Алина Викторовна.",
+    createdAt: new Date("2026-08-28T17:45:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/shoes.svg",
+    productName: "Кроссовки городские",
+    article: "SH-102",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 115,
+    customerId: "c5",
+    customerName: "Мороз Алина Викторовна",
+    customerPhone: "+375 29 220-67-41"
+  },
+  {
+    id: "7",
+    description: "Ботинки челси, арт. SH-088, 1 шт. Оплата на кассе. Клиент: Белов Никита Олегович.",
+    createdAt: new Date("2026-08-30T12:30:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/shoes.svg",
+    productName: "Ботинки челси",
+    article: "SH-088",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 128,
+    customerId: "c6",
+    customerName: "Белов Никита Олегович",
+    customerPhone: "+375 33 118-55-26"
+  },
+  {
+    id: "8",
+    description: "Кроссовки городские, арт. SH-102, 1 шт. Покупатель примерил вещь. Клиент: Кузнецов Илья Павлович.",
+    createdAt: new Date("2026-09-02T14:15:00"),
+    author: "Пашкевич Елена",
+    productName: "Кроссовки городские",
+    article: "SH-102",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 115,
+    customerId: "c2",
+    customerName: "Кузнецов Илья Павлович",
+    customerPhone: "+375 33 701-22-90"
+  },
+  {
+    id: "9",
+    description: "Пальто шерстяное, арт. PL-104, 1 шт. Постоянный клиент. Клиент: Яскевич Ольга Борисовна.",
+    createdAt: new Date("2026-09-03T11:05:00"),
+    author: "Соколова Мария",
+    photoLink: "img/clothing.svg",
+    productName: "Пальто шерстяное",
+    article: "PL-104",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 189,
+    customerId: "c9",
+    customerName: "Яскевич Ольга Борисовна",
+    customerPhone: "+375 29 334-19-85"
+  },
+  {
+    id: "10",
+    description: "Кардиган из кашемира, арт. PL-221, 1 шт. Товар выдан со склада. Клиент: Романов Глеб Сергеевич.",
+    createdAt: new Date("2026-09-07T18:20:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/clothing.svg",
+    productName: "Кардиган из кашемира",
+    article: "PL-221",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 142.5,
+    customerId: "c10",
+    customerName: "Романов Глеб Сергеевич",
+    customerPhone: "+375 33 267-40-52"
+  },
+  {
+    id: "11",
+    description: "Ботинки челси, арт. SH-088, 1 шт. Продажа в вечерней смене. Клиент: Яскевич Ольга Борисовна.",
+    createdAt: new Date("2026-09-09T13:40:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/shoes.svg",
+    productName: "Ботинки челси",
+    article: "SH-088",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 128,
+    customerId: "c9",
+    customerName: "Яскевич Ольга Борисовна",
+    customerPhone: "+375 29 334-19-85"
+  },
+  {
+    id: "12",
+    description: "Кардиган из кашемира, арт. PL-221, 1 шт. Без предзаказа. Клиент: Петрова Анна Сергеевна.",
+    createdAt: new Date("2026-09-14T16:10:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/clothing.svg",
+    productName: "Кардиган из кашемира",
+    article: "PL-221",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 142.5,
+    customerId: "c1",
+    customerName: "Петрова Анна Сергеевна",
+    customerPhone: "+375 29 612-44-18"
+  },
+  {
+    id: "13",
+    description: "Сумка кросс-боди, арт. LG-007, 1 шт. Оплата на кассе. Клиент: Кузнецов Илья Павлович.",
+    createdAt: new Date("2026-09-16T12:55:00"),
+    author: "Соколова Мария",
+    photoLink: "img/leather.svg",
+    productName: "Сумка кросс-боди",
+    article: "LG-007",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 74,
+    customerId: "c2",
+    customerName: "Кузнецов Илья Павлович",
+    customerPhone: "+375 33 701-22-90"
+  },
+  {
+    id: "14",
+    description: "Блуза шёлковая, арт. PL-118, 2 шт. Покупатель примерил вещь. Клиент: Мороз Алина Викторовна.",
+    createdAt: new Date("2026-09-18T15:35:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/clothing.svg",
+    productName: "Блуза шёлковая",
+    article: "PL-118",
+    category: "Одежда",
+    quantity: 2,
+    unitPrice: 67,
+    customerId: "c5",
+    customerName: "Мороз Алина Викторовна",
+    customerPhone: "+375 29 220-67-41"
+  },
+  {
+    id: "15",
+    description: "Платье миди, арт. PL-330, 1 шт. Постоянный клиент. Клиент: Белов Никита Олегович.",
+    createdAt: new Date("2026-09-20T11:50:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/clothing.svg",
+    productName: "Платье миди",
+    article: "PL-330",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 84,
+    customerId: "c6",
+    customerName: "Белов Никита Олегович",
+    customerPhone: "+375 33 118-55-26"
+  },
+  {
+    id: "16",
+    description: "Кардиган из кашемира, арт. PL-221, 1 шт. Товар выдан со склада. Клиент: Яскевич Ольга Борисовна.",
+    createdAt: new Date("2026-09-25T17:05:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/clothing.svg",
+    productName: "Кардиган из кашемира",
+    article: "PL-221",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 142.5,
+    customerId: "c9",
+    customerName: "Яскевич Ольга Борисовна",
+    customerPhone: "+375 29 334-19-85"
+  },
+  {
+    id: "17",
+    description: "Туфли лодочки, арт. SH-015, 1 шт. Продажа в вечерней смене. Клиент: Гринь Вера Николаевна.",
+    createdAt: new Date("2026-09-28T13:15:00"),
+    author: "Соколова Мария",
+    photoLink: "img/shoes.svg",
+    productName: "Туфли лодочки",
+    article: "SH-015",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 96,
+    customerId: "c7",
+    customerName: "Гринь Вера Николаевна",
+    customerPhone: "+375 29 903-48-12"
+  },
+  {
+    id: "18",
+    description: "Блуза шёлковая, арт. PL-118, 1 шт. Без предзаказа. Клиент: Кузнецов Илья Павлович.",
+    createdAt: new Date("2026-10-02T14:45:00"),
+    author: "Лебедев Артём",
+    productName: "Блуза шёлковая",
+    article: "PL-118",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 67,
+    customerId: "c2",
+    customerName: "Кузнецов Илья Павлович",
+    customerPhone: "+375 33 701-22-90"
+  },
+  {
+    id: "19",
+    description: "Туфли лодочки, арт. SH-015, 1 шт. Оплата на кассе. Клиент: Романов Глеб Сергеевич.",
+    createdAt: new Date("2026-10-05T16:30:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/shoes.svg",
+    productName: "Туфли лодочки",
+    article: "SH-015",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 96,
+    customerId: "c10",
+    customerName: "Романов Глеб Сергеевич",
+    customerPhone: "+375 33 267-40-52"
+  },
+  {
+    id: "20",
+    description: "Сумка кросс-боди, арт. LG-007, 1 шт. Покупатель примерил вещь. Клиент: Петрова Анна Сергеевна.",
+    createdAt: new Date("2026-10-08T12:20:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/leather.svg",
+    productName: "Сумка кросс-боди",
+    article: "LG-007",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 74,
+    customerId: "c1",
+    customerName: "Петрова Анна Сергеевна",
+    customerPhone: "+375 29 612-44-18"
+  },
+  {
+    id: "21",
+    description: "Ремень кожаный, арт. LG-019, 1 шт. Постоянный клиент. Клиент: Белов Никита Олегович.",
+    createdAt: new Date("2026-10-11T18:05:00"),
+    author: "Соколова Мария",
+    photoLink: "img/leather.svg",
+    productName: "Ремень кожаный",
+    article: "LG-019",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 36,
+    customerId: "c6",
+    customerName: "Белов Никита Олегович",
+    customerPhone: "+375 33 118-55-26"
+  },
+  {
+    id: "22",
+    description: "Туфли лодочки, арт. SH-015, 1 шт. Товар выдан со склада. Клиент: Мороз Алина Викторовна.",
+    createdAt: new Date("2026-10-15T11:40:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/shoes.svg",
+    productName: "Туфли лодочки",
+    article: "SH-015",
+    category: "Обувь",
+    quantity: 1,
+    unitPrice: 96,
+    customerId: "c5",
+    customerName: "Мороз Алина Викторовна",
+    customerPhone: "+375 29 220-67-41"
+  },
+  {
+    id: "23",
+    description: "Блуза шёлковая, арт. PL-118, 1 шт. Продажа в вечерней смене. Клиент: Орлова Дарья Игоревна.",
+    createdAt: new Date("2026-10-18T15:10:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/clothing.svg",
+    productName: "Блуза шёлковая",
+    article: "PL-118",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 67,
+    customerId: "c3",
+    customerName: "Орлова Дарья Игоревна",
+    customerPhone: "+375 29 445-10-77"
+  },
+  {
+    id: "24",
+    description: "Ремень кожаный, арт. LG-019, 2 шт. Без предзаказа. Клиент: Яскевич Ольга Борисовна.",
+    createdAt: new Date("2026-10-21T13:25:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/leather.svg",
+    productName: "Ремень кожаный",
+    article: "LG-019",
+    category: "Кожгалантерея",
+    quantity: 2,
+    unitPrice: 36,
+    customerId: "c9",
+    customerName: "Яскевич Ольга Борисовна",
+    customerPhone: "+375 29 334-19-85"
+  },
+  {
+    id: "25",
+    description: "Платье миди, арт. PL-330, 1 шт. Оплата на кассе. Клиент: Литвин София Артёмовна.",
+    createdAt: new Date("2026-10-25T17:55:00"),
+    author: "Соколова Мария",
+    photoLink: "img/clothing.svg",
+    productName: "Платье миди",
+    article: "PL-330",
+    category: "Одежда",
+    quantity: 1,
+    unitPrice: 84,
+    customerId: "c11",
+    customerName: "Литвин София Артёмовна",
+    customerPhone: "+375 29 156-83-04"
+  },
+  {
+    id: "26",
+    description: "Портмоне, арт. LG-025, 1 шт. Покупатель примерил вещь. Клиент: Мороз Алина Викторовна.",
+    createdAt: new Date("2026-10-28T12:35:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/leather.svg",
+    productName: "Портмоне",
+    article: "LG-025",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 42,
+    customerId: "c5",
+    customerName: "Мороз Алина Викторовна",
+    customerPhone: "+375 29 220-67-41"
+  },
+  {
+    id: "27",
+    description: "Колготки 40 den, арт. HS-003, 1 шт. Постоянный клиент. Клиент: Гринь Вера Николаевна.",
+    createdAt: new Date("2026-11-01T14:20:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/hosiery.svg",
+    productName: "Колготки 40 den",
+    article: "HS-003",
+    category: "Чулочно-носочные изделия",
+    quantity: 1,
+    unitPrice: 12.5,
+    customerId: "c7",
+    customerName: "Гринь Вера Николаевна",
+    customerPhone: "+375 29 903-48-12"
+  },
+  {
+    id: "28",
+    description: "Колготки 40 den, арт. HS-003, 2 шт. Товар выдан со склада. Клиент: Дрозд Марина Юрьевна.",
+    createdAt: new Date("2026-11-03T16:45:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/hosiery.svg",
+    productName: "Колготки 40 den",
+    article: "HS-003",
+    category: "Чулочно-носочные изделия",
+    quantity: 2,
+    unitPrice: 12.5,
+    customerId: "c12",
+    customerName: "Дрозд Марина Юрьевна",
+    customerPhone: "+375 25 741-09-33"
+  },
+  {
+    id: "29",
+    description: "Колготки 40 den, арт. HS-003, 1 шт. Продажа в вечерней смене. Клиент: Петрова Анна Сергеевна.",
+    createdAt: new Date("2026-11-04T11:15:00"),
+    author: "Соколова Мария",
+    photoLink: "img/hosiery.svg",
+    productName: "Колготки 40 den",
+    article: "HS-003",
+    category: "Чулочно-носочные изделия",
+    quantity: 1,
+    unitPrice: 12.5,
+    customerId: "c1",
+    customerName: "Петрова Анна Сергеевна",
+    customerPhone: "+375 29 612-44-18"
+  },
+  {
+    id: "30",
+    description: "Носки шерстяные, арт. HS-014, 1 шт. Без предзаказа. Клиент: Кузнецов Илья Павлович.",
+    createdAt: new Date("2026-11-06T15:50:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/hosiery.svg",
+    productName: "Носки шерстяные",
+    article: "HS-014",
+    category: "Чулочно-носочные изделия",
+    quantity: 1,
+    unitPrice: 9.8,
+    customerId: "c2",
+    customerName: "Кузнецов Илья Павлович",
+    customerPhone: "+375 33 701-22-90"
+  },
+  {
+    id: "31",
+    description: "Колготки 40 den, арт. HS-003, 2 шт. Оплата на кассе. Клиент: Яскевич Ольга Борисовна.",
+    createdAt: new Date("2026-11-08T13:30:00"),
+    author: "Ковалёва Ирина",
+    photoLink: "img/hosiery.svg",
+    productName: "Колготки 40 den",
+    article: "HS-003",
+    category: "Чулочно-носочные изделия",
+    quantity: 2,
+    unitPrice: 12.5,
+    customerId: "c9",
+    customerName: "Яскевич Ольга Борисовна",
+    customerPhone: "+375 29 334-19-85"
+  },
+  {
+    id: "32",
+    description: "Сумка кросс-боди, арт. LG-007, 1 шт. Покупатель примерил вещь. Клиент: Романов Глеб Сергеевич.",
+    createdAt: new Date("2026-11-09T18:10:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/leather.svg",
+    productName: "Сумка кросс-боди",
+    article: "LG-007",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 74,
+    customerId: "c10",
+    customerName: "Романов Глеб Сергеевич",
+    customerPhone: "+375 33 267-40-52"
+  },
+  {
+    id: "33",
+    description: "Носки шерстяные, арт. HS-014, 2 шт. Постоянный клиент. Клиент: Савицкий Павел Андреевич.",
+    createdAt: new Date("2026-11-10T12:40:00"),
+    author: "Соколова Мария",
+    photoLink: "img/hosiery.svg",
+    productName: "Носки шерстяные",
+    article: "HS-014",
+    category: "Чулочно-носочные изделия",
+    quantity: 2,
+    unitPrice: 9.8,
+    customerId: "c4",
+    customerName: "Савицкий Павел Андреевич",
+    customerPhone: "+375 25 880-14-03"
+  },
+  {
+    id: "34",
+    description: "Носки шерстяные, арт. HS-014, 2 шт. Товар выдан со склада. Клиент: Белов Никита Олегович.",
+    createdAt: new Date("2026-11-11T17:25:00"),
+    author: "Лебедев Артём",
+    photoLink: "img/hosiery.svg",
+    productName: "Носки шерстяные",
+    article: "HS-014",
+    category: "Чулочно-носочные изделия",
+    quantity: 2,
+    unitPrice: 9.8,
+    customerId: "c6",
+    customerName: "Белов Никита Олегович",
+    customerPhone: "+375 33 118-55-26"
+  },
+  {
+    id: "35",
+    description: "Носки шерстяные, арт. HS-014, 1 шт. Продажа в вечерней смене. Клиент: Орлова Дарья Игоревна.",
+    createdAt: new Date("2026-11-14T14:55:00"),
+    author: "Ковалёва Ирина",
+    productName: "Носки шерстяные",
+    article: "HS-014",
+    category: "Чулочно-носочные изделия",
+    quantity: 1,
+    unitPrice: 9.8,
+    customerId: "c3",
+    customerName: "Орлова Дарья Игоревна",
+    customerPhone: "+375 29 445-10-77"
+  },
+  {
+    id: "36",
+    description: "Ремень кожаный, арт. LG-019, 1 шт. Без предзаказа. Клиент: Литвин София Артёмовна.",
+    createdAt: new Date("2026-11-15T16:05:00"),
+    author: "Пашкевич Елена",
+    photoLink: "img/leather.svg",
+    productName: "Ремень кожаный",
+    article: "LG-019",
+    category: "Кожгалантерея",
+    quantity: 1,
+    unitPrice: 36,
+    customerId: "c11",
+    customerName: "Литвин София Артёмовна",
+    customerPhone: "+375 29 156-83-04"
+  },
+];
+
+var receipts = [
+  {
+    id: "r1",
+    invoiceNumber: "НК-2401",
+    description: "Поступление по накладной НК-2401: Пальто шерстяное, 4 шт.",
+    createdAt: new Date("2026-08-01T09:30:00"),
+    author: 'Морозов Павел',
+    article: "PL-104",
+    productName: "Пальто шерстяное",
+    category: "Одежда",
+    quantity: 4
+  },
+  {
+    id: "r2",
+    invoiceNumber: "НК-2401",
+    description: "Поступление по накладной НК-2401: Кардиган из кашемира, 4 шт.",
+    createdAt: new Date("2026-08-01T09:30:00"),
+    author: 'Морозов Павел',
+    article: "PL-221",
+    productName: "Кардиган из кашемира",
+    category: "Одежда",
+    quantity: 4
+  },
+  {
+    id: "r3",
+    invoiceNumber: "НК-2401",
+    description: "Поступление по накладной НК-2401: Платье миди, 4 шт.",
+    createdAt: new Date("2026-08-01T09:30:00"),
+    author: 'Морозов Павел',
+    article: "PL-330",
+    productName: "Платье миди",
+    category: "Одежда",
+    quantity: 4
+  },
+  {
+    id: "r4",
+    invoiceNumber: "НК-2401",
+    description: "Поступление по накладной НК-2401: Блуза шёлковая, 5 шт.",
+    createdAt: new Date("2026-08-01T09:30:00"),
+    author: 'Морозов Павел',
+    article: "PL-118",
+    productName: "Блуза шёлковая",
+    category: "Одежда",
+    quantity: 5
+  },
+  {
+    id: "r5",
+    invoiceNumber: "НК-2402",
+    description: "Поступление по накладной НК-2402: Ботинки челси, 4 шт.",
+    createdAt: new Date("2026-08-18T10:00:00"),
+    author: 'Морозов Павел',
+    article: "SH-088",
+    productName: "Ботинки челси",
+    category: "Обувь",
+    quantity: 4
+  },
+  {
+    id: "r6",
+    invoiceNumber: "НК-2402",
+    description: "Поступление по накладной НК-2402: Туфли лодочки, 4 шт.",
+    createdAt: new Date("2026-08-18T10:00:00"),
+    author: 'Морозов Павел',
+    article: "SH-015",
+    productName: "Туфли лодочки",
+    category: "Обувь",
+    quantity: 4
+  },
+  {
+    id: "r7",
+    invoiceNumber: "НК-2402",
+    description: "Поступление по накладной НК-2402: Кроссовки городские, 3 шт.",
+    createdAt: new Date("2026-08-18T10:00:00"),
+    author: 'Морозов Павел',
+    article: "SH-102",
+    productName: "Кроссовки городские",
+    category: "Обувь",
+    quantity: 3
+  },
+  {
+    id: "r8",
+    invoiceNumber: "НК-2403",
+    description: "Поступление по накладной НК-2403: Сумка кросс-боди, 5 шт.",
+    createdAt: new Date("2026-09-05T09:15:00"),
+    author: 'Морозов Павел',
+    article: "LG-007",
+    productName: "Сумка кросс-боди",
+    category: "Кожгалантерея",
+    quantity: 5
+  },
+  {
+    id: "r9",
+    invoiceNumber: "НК-2403",
+    description: "Поступление по накладной НК-2403: Ремень кожаный, 6 шт.",
+    createdAt: new Date("2026-09-05T09:15:00"),
+    author: 'Морозов Павел',
+    article: "LG-019",
+    productName: "Ремень кожаный",
+    category: "Кожгалантерея",
+    quantity: 6
+  },
+  {
+    id: "r10",
+    invoiceNumber: "НК-2403",
+    description: "Поступление по накладной НК-2403: Портмоне, 3 шт.",
+    createdAt: new Date("2026-09-05T09:15:00"),
+    author: 'Морозов Павел',
+    article: "LG-025",
+    productName: "Портмоне",
+    category: "Кожгалантерея",
+    quantity: 3
+  },
+  {
+    id: "r11",
+    invoiceNumber: "НК-2404",
+    description: "Поступление по накладной НК-2404: Колготки 40 den, 8 шт.",
+    createdAt: new Date("2026-09-20T14:40:00"),
+    author: 'Морозов Павел',
+    article: "HS-003",
+    productName: "Колготки 40 den",
+    category: "Чулочно-носочные изделия",
+    quantity: 8
+  },
+  {
+    id: "r12",
+    invoiceNumber: "НК-2404",
+    description: "Поступление по накладной НК-2404: Носки шерстяные, 10 шт.",
+    createdAt: new Date("2026-09-20T14:40:00"),
+    author: 'Морозов Павел',
+    article: "HS-014",
+    productName: "Носки шерстяные",
+    category: "Чулочно-носочные изделия",
+    quantity: 10
+  },
+  {
+    id: "r13",
+    invoiceNumber: "НК-2405",
+    description: "Поступление по накладной НК-2405: Пальто шерстяное, 2 шт.",
+    createdAt: new Date("2026-10-12T11:05:00"),
+    author: 'Морозов Павел',
+    article: "PL-104",
+    productName: "Пальто шерстяное",
+    category: "Одежда",
+    quantity: 2
+  },
+  {
+    id: "r14",
+    invoiceNumber: "НК-2405",
+    description: "Поступление по накладной НК-2405: Ботинки челси, 2 шт.",
+    createdAt: new Date("2026-10-12T11:05:00"),
+    author: 'Морозов Павел',
+    article: "SH-088",
+    productName: "Ботинки челси",
+    category: "Обувь",
+    quantity: 2
+  },
+  {
+    id: "r15",
+    invoiceNumber: "НК-2405",
+    description: "Поступление по накладной НК-2405: Сумка кросс-боди, 2 шт.",
+    createdAt: new Date("2026-10-12T11:05:00"),
+    author: 'Морозов Павел',
+    article: "LG-007",
+    productName: "Сумка кросс-боди",
+    category: "Кожгалантерея",
+    quantity: 2
+  },
+  {
+    id: "r16",
+    invoiceNumber: "НК-2406",
+    description: "Поступление по накладной НК-2406: Носки шерстяные, 4 шт.",
+    createdAt: new Date("2026-11-02T09:50:00"),
+    author: 'Морозов Павел',
+    article: "HS-014",
+    productName: "Носки шерстяные",
+    category: "Чулочно-носочные изделия",
+    quantity: 4
+  },
+  {
+    id: "r17",
+    invoiceNumber: "НК-2406",
+    description: "Поступление по накладной НК-2406: Блуза шёлковая, 2 шт.",
+    createdAt: new Date("2026-11-02T09:50:00"),
+    author: 'Морозов Павел',
+    article: "PL-118",
+    productName: "Блуза шёлковая",
+    category: "Одежда",
+    quantity: 2
+  },
+  {
+    id: "r18",
+    invoiceNumber: "НК-2406",
+    description: "Поступление по накладной НК-2406: Кроссовки городские, 2 шт.",
+    createdAt: new Date("2026-11-02T09:50:00"),
+    author: 'Морозов Павел',
+    article: "SH-102",
+    productName: "Кроссовки городские",
+    category: "Обувь",
+    quantity: 2
+  },
+];
